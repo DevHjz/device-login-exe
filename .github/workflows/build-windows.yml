@@ -7,40 +7,39 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  build-windows:
+    runs-on: windows-latest  # 必须用 Windows  runner
+    strategy:
+      matrix:
+        arch: [x64, arm64]   # 同时构建两个架构
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 18
+      - name: Setup Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
 
-    - name: Install pnpm
-      run: npm install -g pnpm
+      - name: Install pnpm
+        run: npm install -g pnpm
 
-    - name: Install dependencies
-      run: pnpm install
+      - name: Install dependencies
+        run: pnpm install
 
-    - name: Build with pkg for Windows x64 and ARM64
-      run: pnpm run build:pkg
-      env:
-        CASDOOR_SERVER_URL: ${{ secrets.CASDOOR_SERVER_URL }}
-        CASDOOR_CLIENT_ID: ${{ secrets.CASDOOR_CLIENT_ID }}
-        ALLOWED_ORIGINS: ${{ secrets.ALLOWED_ORIGINS }}
-        # APP_BASE_DIR and COMPANION_PORT can be left as default or configured if needed
+      # 构建 Windows x64
+      - name: Build Windows ${{ matrix.arch }}
+        run: |
+          pnpm run build:pkg --targets node18-win-${{ matrix.arch }}
+        env:
+          CASDOOR_SERVER_URL: ${{ secrets.CASDOOR_SERVER_URL }}
+          CASDOOR_CLIENT_ID: ${{ secrets.CASDOOR_CLIENT_ID }}
+          ALLOWED_ORIGINS: ${{ secrets.ALLOWED_ORIGINS }}
 
-    - name: Upload Windows x64 artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: quick-login-app-win-x64
-        path: quick-login-app-win.exe # pkg output name for x64
-
-    - name: Upload Windows ARM64 artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: quick-login-app-win-arm64
-        path: quick-login-app-win-arm64.exe # pkg output name for arm64
+      # 自动匹配 pkg 输出文件名
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: quick-login-app-win-${{ matrix.arch }}
+          path: "*-win-${{ matrix.arch }}.exe"  # 自动匹配，不用写死
