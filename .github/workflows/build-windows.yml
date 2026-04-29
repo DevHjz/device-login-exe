@@ -1,0 +1,46 @@
+name: Build Windows App
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+
+    - name: Install pnpm
+      run: npm install -g pnpm
+
+    - name: Install dependencies
+      run: pnpm install
+
+    - name: Build with pkg for Windows x64 and ARM64
+      run: pnpm run build:pkg
+      env:
+        CASDOOR_SERVER_URL: ${{ secrets.CASDOOR_SERVER_URL }}
+        CASDOOR_CLIENT_ID: ${{ secrets.CASDOOR_CLIENT_ID }}
+        ALLOWED_ORIGINS: ${{ secrets.ALLOWED_ORIGINS }}
+        # APP_BASE_DIR and COMPANION_PORT can be left as default or configured if needed
+
+    - name: Upload Windows x64 artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: quick-login-app-win-x64
+        path: quick-login-app-win.exe # pkg output name for x64
+
+    - name: Upload Windows ARM64 artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: quick-login-app-win-arm64
+        path: quick-login-app-win-arm64.exe # pkg output name for arm64

@@ -1,0 +1,31 @@
+{
+  "name": "quick-login-app",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "bin": "index.ts",
+  "pkg": {
+    "scripts": "casdoor-sdk/**/*.ts",
+    "assets": "casdoor-sdk/lib/cjs/**/*.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:pkg": "pkg . --targets node18-win-x64,node18-win-arm64"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "axios": "^1.15.2",
+    "form-data": "^4.0.5",
+    "jsonwebtoken": "^9.0.3",
+    "node-fetch": "^2.7.0"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^25.6.0",
+    "pkg": "^5.8.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3"
+  }
+}
