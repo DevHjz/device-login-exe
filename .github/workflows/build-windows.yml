@@ -25,10 +25,11 @@ jobs:
     - name: Install dependencies
       run: pnpm install
 
-    - name: Compile TypeScript to JS
-      run: pnpm tsc
+    # 修复在这里！强制编译
+    - name: Compile TypeScript
+      run: pnpm tsc --project tsconfig.json
 
-    - name: Build EXE for Windows x64
+    - name: Build EXE
       run: npx pkg ./dist/index.js --output quick-login-app --targets node18-win-x64
       env:
         CASDOOR_SERVER_URL: ${{ secrets.CASDOOR_SERVER_URL }}
