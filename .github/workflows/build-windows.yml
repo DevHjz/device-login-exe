@@ -28,10 +28,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      # 直接调用 pkg，不经过 scripts！彻底避开冲突
+      # 关键修复：用 npx 调用 pkg，绝对能找到！
       - name: Build Windows ${{ matrix.arch }}
         run: |
-          pkg . --output quick-login-app --targets node18-win-${{ matrix.arch }}
+          npx pkg . --output quick-login-app --targets node18-win-${{ matrix.arch }}
         env:
           CASDOOR_SERVER_URL: ${{ secrets.CASDOOR_SERVER_URL }}
           CASDOOR_CLIENT_ID: ${{ secrets.CASDOOR_CLIENT_ID }}
