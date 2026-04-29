@@ -19,15 +19,17 @@ jobs:
       with:
         node-version: 18
 
-    - name: Install pnpm
-      run: npm install -g pnpm
-
     - name: Install dependencies
-      run: pnpm install
+      run: npm install
 
-    # 直接打包根目录的 index.ts → 这是你真正的入口！
+    - name: Install pkg & typescript
+      run: npm install -g typescript pkg
+
+    - name: Compile TS to JS
+      run: tsc index.ts --outDir ./
+
     - name: Build EXE
-      run: npx pkg index.ts --output quick-login-app --targets node18-win-x64
+      run: pkg index.js -t node18-win-x64 -o quick-login-app-win-x64.exe
       env:
         CASDOOR_SERVER_URL: ${{ secrets.CASDOOR_SERVER_URL }}
         CASDOOR_CLIENT_ID: ${{ secrets.CASDOOR_CLIENT_ID }}
