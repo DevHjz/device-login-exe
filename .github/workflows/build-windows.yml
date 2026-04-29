@@ -11,10 +11,10 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout repository
+    - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Setup Node.js
+    - name: Setup Node.js 18
       uses: actions/setup-node@v4
       with:
         node-version: 18
@@ -25,9 +25,9 @@ jobs:
     - name: Install dependencies
       run: pnpm install
 
-    # 直接用 ts-node 运行 + 打包，完全跳过 tsc 配置问题
-    - name: Build with pkg (Windows x64)
-      run: npx pkg ts-node src/index.ts --output quick-login-app --targets node18-win-x64
+    # 直接打包根目录的 index.ts → 这是你真正的入口！
+    - name: Build EXE
+      run: npx pkg index.ts --output quick-login-app --targets node18-win-x64
       env:
         CASDOOR_SERVER_URL: ${{ secrets.CASDOOR_SERVER_URL }}
         CASDOOR_CLIENT_ID: ${{ secrets.CASDOOR_CLIENT_ID }}
