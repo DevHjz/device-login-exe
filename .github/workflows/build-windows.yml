@@ -8,10 +8,10 @@ on:
 
 jobs:
   build-windows:
-    runs-on: windows-latest  # 必须用 Windows  runner
+    runs-on: windows-latest
     strategy:
       matrix:
-        arch: [x64, arm64]   # 同时构建两个架构
+        arch: [x64, arm64]
 
     steps:
       - name: Checkout code
@@ -28,18 +28,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      # 构建 Windows x64
       - name: Build Windows ${{ matrix.arch }}
-        run: |
-          pnpm run build:pkg --targets node18-win-${{ matrix.arch }}
+        run: pnpm build:pkg --targets node18-win-${{ matrix.arch }}
         env:
           CASDOOR_SERVER_URL: ${{ secrets.CASDOOR_SERVER_URL }}
           CASDOOR_CLIENT_ID: ${{ secrets.CASDOOR_CLIENT_ID }}
           ALLOWED_ORIGINS: ${{ secrets.ALLOWED_ORIGINS }}
 
-      # 自动匹配 pkg 输出文件名
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: quick-login-app-win-${{ matrix.arch }}
-          path: "*-win-${{ matrix.arch }}.exe"  # 自动匹配，不用写死
+          path: "quick-login-app-win-${{ matrix.arch }}.exe"
