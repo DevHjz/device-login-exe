@@ -1,4 +1,4 @@
-name: Build Windows App
+name: Build Windows x64 App
 
 on:
   push:
@@ -7,38 +7,36 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-windows:
+  build:
     runs-on: windows-latest
-    strategy:
-      matrix:
-        arch: [x64, arm64]
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v4
 
-      - name: Setup Node.js 18
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
+    - name: Setup Node.js 18
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
 
-      - name: Install pnpm
-        run: npm install -g pnpm
+    - name: Install pnpm
+      run: npm install -g pnpm
 
-      - name: Install dependencies
-        run: pnpm install
+    - name: Install dependencies
+      run: pnpm install
 
-      # 关键修复：用 npx 调用 pkg，绝对能找到！
-      - name: Build Windows ${{ matrix.arch }}
-        run: |
-          npx pkg . --output quick-login-app --targets node18-win-${{ matrix.arch }}
-        env:
-          CASDOOR_SERVER_URL: ${{ secrets.CASDOOR_SERVER_URL }}
-          CASDOOR_CLIENT_ID: ${{ secrets.CASDOOR_CLIENT_ID }}
-          ALLOWED_ORIGINS: ${{ secrets.ALLOWED_ORIGINS }}
+    - name: Compile TypeScript to JS
+      run: pnpm tsc
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: quick-login-app-win-${{ matrix.arch }}
-          path: "quick-login-app-win-${{ matrix.arch }}.exe"
+    - name: Build EXE for Windows x64
+      run: npx pkg ./dist/index.js --output quick-login-app --targets node18-win-x64
+      env:
+        CASDOOR_SERVER_URL: ${{ secrets.CASDOOR_SERVER_URL }}
+        CASDOOR_CLIENT_ID: ${{ secrets.CASDOOR_CLIENT_ID }}
+        ALLOWED_ORIGINS: ${{ secrets.ALLOWED_ORIGINS }}
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: quick-login-app-win-x64
+        path: quick-login-app-win-x64.exe
